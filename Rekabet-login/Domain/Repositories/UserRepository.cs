@@ -22,26 +22,10 @@ namespace Rekabet_login.Domain.Repositories
         {
             try
             {
-                var client = new MongoClient(
-        "mongodb+srv://admin:cIXFELqrHE5ZRLJa@cluster0.9yyph.mongodb.net/<Cluster0>?retryWrites=true&w=majority"
-        );
-                IMongoDatabase database = client.GetDatabase("competition");
-
                 var users = await context.Users.Find(new BsonDocument()).ToListAsync();
-                var doc = users.Find(new BsonDocument()).ToList();
+            
+                return users.ToJson();
 
-
-                //var users = Console.WriteLine("aaa");
-                return doc.ToJson();
-
-                var usersList= await context.Users.Find(new BsonDocument()).ToListAsync();
-               // var usersDoc= usersList.ToBsonDocument();
-                List<String> json = new List<string>();
-               
-
-
-                return json;
-                
             }
             catch (Exception ex)
             {
@@ -50,13 +34,14 @@ namespace Rekabet_login.Domain.Repositories
             }
         }
 
-        public async Task<User> GetUser(int id)
+        public async Task<string> GetUser(int id)
         {
-            var filter = Builders<User>.Filter.Eq("Id", id);
+            var filter = Builders<BsonDocument>.Filter.Eq("Id", id);
 
             try
             {
-                return await context.Users.Find(filter).FirstOrDefaultAsync();
+                var user= await context.Users.Find(filter).FirstOrDefaultAsync();
+                return user.ToJson();
             }
             catch (Exception ex)
             {
@@ -69,7 +54,9 @@ namespace Rekabet_login.Domain.Repositories
         {
             try
             {
-                await context.Users.InsertOneAsync(user);
+                BsonDocument userDoc = user.ToBsonDocument();
+                 await context.Users.InsertOneAsync(userDoc);
+                
             }
             catch (Exception ex)
             {
@@ -78,21 +65,21 @@ namespace Rekabet_login.Domain.Repositories
             }
         }
 
-        public async Task<bool> RemoveUser(int id)
-        {
-            try
-            {
-                DeleteResult actionResult = await context.Users.DeleteOneAsync(Builders<User>.Filter.Eq("Id", id));
+        //public async Task<bool> RemoveUser(int id)
+        //{
+        //    try
+        //    {
+        //        DeleteResult actionResult = await context.Users.DeleteOneAsync(Builders<User>.Filter.Eq("Id", id));
 
-                return actionResult.IsAcknowledged
-                    && actionResult.DeletedCount > 0;
-            }
-            catch (Exception ex)
-            {
-                // log or manage the exception
-                throw ex;
-            }
-        }
+        //        return actionResult.IsAcknowledged
+        //            && actionResult.DeletedCount > 0;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // log or manage the exception
+        //        throw ex;
+        //    }
+        //}
 
         //public async Task<bool> UpdateUserName(int id, string name)
         //{
@@ -100,7 +87,7 @@ namespace Rekabet_login.Domain.Repositories
 
         //    var filter = Builders<User>.Filter.Eq(s => s.Id, id);
         //    var update = Builders<User>.Update.Set(s => s.Kisi_adi, name);
-            
+
         //    try
         //    {
         //        UpdateResult actionResult
@@ -111,43 +98,43 @@ namespace Rekabet_login.Domain.Repositories
         //    }
         //    catch (Exception ex)
         //    {
-                
+
         //        throw ex;
         //    }
         //}
 
-        public async Task<bool> UpdateUser(int id, User user)
-        {
-            try
-            {
-                ReplaceOneResult actionResult = await context.Users.ReplaceOneAsync(n => n.Id.Equals(id), user, new UpdateOptions { IsUpsert = true });
-                return actionResult.IsAcknowledged
-                    && actionResult.ModifiedCount > 0;
-            }
-            catch (Exception ex)
-            {
-                // log or manage the exception
-                throw ex;
-            }
-        }
+        //public async Task<bool> UpdateUser(int id, User user)
+        //{
+        //    try
+        //    {
+        //        ReplaceOneResult actionResult = await context.Users.ReplaceOneAsync(n => n.Id.Equals(id), user, new UpdateOptions { IsUpsert = true });
+        //        return actionResult.IsAcknowledged
+        //            && actionResult.ModifiedCount > 0;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // log or manage the exception
+        //        throw ex;
+        //    }
+        //}
 
-        public async Task<bool> RemoveAllUsers()
-        {
-            try
-            {
-                DeleteResult actionResult
-                    = await context.Users.DeleteManyAsync(new BsonDocument());
+        //public async Task<bool> RemoveAllUsers()
+        //{
+        //    try
+        //    {
+        //        DeleteResult actionResult
+        //            = await context.Users.DeleteManyAsync(new BsonDocument());
 
-                return actionResult.IsAcknowledged
-                    && actionResult.DeletedCount > 0;
-            }
-            catch (Exception ex)
-            {
-                // log or manage the exception
-                throw ex;
-            }
-        }
+        //        return actionResult.IsAcknowledged
+        //            && actionResult.DeletedCount > 0;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // log or manage the exception
+        //        throw ex;
+        //    }
+        //}
 
-        
+
     }
 }

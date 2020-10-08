@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Rekabet_login.Domain.Models;
 
@@ -24,11 +25,11 @@ namespace Rekabet_login.Domain.Entities
                 _database = client.GetDatabase(settings.Value.Database);
         }
 
-        public IMongoCollection<User> Users
+        public IMongoCollection<BsonDocument> Users
         {
             get
             {
-                return _database.GetCollection<User>("user");
+                return _database.GetCollection<BsonDocument>("user");
             }
         }
     }

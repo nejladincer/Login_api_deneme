@@ -11,6 +11,8 @@ using Rekabet_login.Domain.Models;
 using MongoDB.Bson;
 using System.Text.RegularExpressions;
 using MongoDB.Driver;
+using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Rekabet_login.Controllers
 {
@@ -25,67 +27,32 @@ namespace Rekabet_login.Controllers
             this.userRepository = userRepository;
         }
 
-        // GET: user/users
+        // GET: api/user
+        //user collection'undaki bütün userları çekmeye yarayan fonksiyondur.
         [HttpGet]
       
         public async Task<string> GetUsers()
         {
-            var client = new MongoClient(
-        "mongodb+srv://admin:cIXFELqrHE5ZRLJa@cluster0.9yyph.mongodb.net/<Cluster0>?retryWrites=true&w=majority"
-        );
-            IMongoDatabase database = client.GetDatabase("competition");
             
-            var users = database.GetCollection<BsonDocument>("user");
-            var doc = users.Find(new BsonDocument()).ToList();
-
-
-            //var users = Console.WriteLine("aaa");
-            return doc.ToJson();
-           // var client = new MongoClient(
-           //"mongodb+srv://admin:cIXFELqrHE5ZRLJa@cluster0.9yyph.mongodb.net/<Cluster0>?retryWrites=true&w=majority"
-           //);
-           // IMongoDatabase database = client.GetDatabase("competition");
-           // var user = database.GetCollection<BsonDocument>("user");
-           // var users = database.GetCollection<BsonDocument>("users");
-            
-           // // var usersDoc= usersList.ToBsonDocument();
-           // List<String> json = new List<string>();
-           // foreach (var a in users)
-           // {
-           //     var b = a.ToString();
-           //     foreach (string x in a.Okuma_yetki)
-           //     {
-           //         b = x.ToString();
-           //     }
-
-           //     foreach (string x in a.Yazma_yetki)
-           //     {
-           //         b = x.ToString();
-           //     }
-
-           //     json.Add(b);
-
-           // }
-
-
-           // return json;
+            return await userRepository.GetAllUsers();
+           
         }
-        ////// GET api/user/1
-        //[HttpGet("{id}")]
-        //public Task<Object> Get(int id)
-        //{
-            
-        //    return GetUserByIdInternal(id);
-        //}
 
-        //private async Task<Object> GetUserByIdInternal(int id)
-        //{
-        //    var user = await userRepository.GetUser(id) ?? new User();
-        //    BsonDocument doc = user.ToBsonDocument();
+        // GET api/user/1
+        //user collection'undaki userları UserId'sine göre çekmeye yarayan fonksiyondur.
+        [Authorize]
+        [HttpGet("{id}")]
+        public async Task<string> Get(int id)
+        {
 
+            return await userRepository.GetUser(id);
+        }
 
-        //    return Newtonsoft.Json.JsonConvert.DeserializeObject(doc.ToString());
-
-        //}
+        [HttpPost]
+        public async Task AddUser(User user)
+        {
+             await userRepository.AddUser(user);
+        }
+        
     }
 }
